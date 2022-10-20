@@ -1,7 +1,6 @@
 package repository
 
 import (
-	movieDomain "github.com/paraizofelipe/star-planet/movie/domain"
 	"github.com/paraizofelipe/star-planet/planet/domain"
 )
 
@@ -14,11 +13,11 @@ type Reader interface {
 type Writer interface {
 	Add(domain.Planet) error
 	RemoveByID(id int) error
+	UpdateOrAdd(domain.Planet) error
 }
 
 type Relater interface {
-	FindMovies(planetID int) ([]movieDomain.Movie, error)
-	AddMovieToPlanet(planetID int, movieID int) error
+	AddFilmToPlanet(planetID int, filmID int) error
 }
 
 type PlanetRepository interface {

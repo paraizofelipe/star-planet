@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	moviesDomain "github.com/paraizofelipe/star-planet/movie/domain"
+	filmsDomain "github.com/paraizofelipe/star-planet/film/domain"
 	"github.com/paraizofelipe/star-planet/planet/domain"
 	"github.com/paraizofelipe/star-planet/storage"
 )
@@ -22,10 +22,11 @@ func NewPostgreRepository(db *sqlx.DB) PlanetRepository {
 
 func (r repository) Add(planet domain.Planet) (err error) {
 	statement := `
-        INSERT INTO planet (
+        INSERT INTO planets (
+            id,
             name,
             climate,
-            terranin,
+            terrain,
             created_at,
             updated_at
         ) VALUES (
@@ -33,10 +34,12 @@ func (r repository) Add(planet domain.Planet) (err error) {
             $2,
             $3,
             $4,
-            $5
+            $5,
+            $6
         );
     `
 	err = r.storage.Exec(statement,
+		planet.ID,
 		planet.Name,
 		planet.Climate,
 		planet.Terrain,
@@ -46,11 +49,11 @@ func (r repository) Add(planet domain.Planet) (err error) {
 	return
 }
 
-func (r repository) AddMovieToPlanet(planetID int, movieID int) (err error) {
+func (r repository) AddFilmToPlanet(planetID int, filmID int) (err error) {
 	statement := `
-			INSERT INTO movie_to_planet (
+			INSERT INTO films_to_planets (
 				planet_id,
-				movie_id,
+				film_id,
 				created_at,
 				updated_at
 			) VALUES (
@@ -62,7 +65,7 @@ func (r repository) AddMovieToPlanet(planetID int, movieID int) (err error) {
 	`
 	err = r.storage.Exec(statement,
 		planetID,
-		movieID,
+		filmID,
 		time.Now().UTC(),
 		time.Now().UTC(),
 	)
@@ -78,7 +81,7 @@ func (r repository) FindByName(name string) (planet domain.Planet, err error) {
         SELECT
             name,
             climate,
-            terranin,
+            terrain,
             created_at,
             updated_at
         FROM
@@ -98,7 +101,7 @@ func (r repository) FindByID(id int) (planet domain.Planet, err error) {
         SELECT
             name,
             climate,
-            terranin,
+            terrain,
             created_at,
             updated_at
         FROM
@@ -113,7 +116,7 @@ func (r repository) FindByID(id int) (planet domain.Planet, err error) {
 	return
 }
 
-func (r repository) FindMovies(planetID int) (movies []moviesDomain.Movie, err error) {
+func (r repository) FindFilms(planetID int) (films []filmsDomain.Film, err error) {
 	statement := `
 		SELECT p.id,
 			m.title, 
@@ -121,14 +124,14 @@ func (r repository) FindMovies(planetID int) (movies []moviesDomain.Movie, err e
 			m.release_date,
 			m.created_at,
 			m.updated_at
-			FROM  movies_to_planets as mp
+			FROM  films_to_planets as mp
 		INNER JOIN planets as p 
 			ON p.id = mp.planet_id
-		INNER JOIN movies as m
-			ON m.id = np.movie_id
+		INNER JOIN films as m
+			ON m.id = mp.film_id
 		WHERE p.id = $1;
 	`
-	err = r.storage.FindAll(statement, &movies, planetID)
+	err = r.storage.FindAll(statement, &films, planetID)
 	if err == sql.ErrNoRows {
 		err = nil
 	}
@@ -140,12 +143,49 @@ func (r repository) FindAll() (planets []domain.Planet, err error) {
         SELECT
             name,
             climate,
-            terranin,
+            terrain,
             created_at,
             updated_at
         FROM
             planets;
 	`
 	err = r.storage.Find(statement, &planets, nil)
+	return
+}
+
+func (r repository) UpdateOrAdd(planet domain.Planet) (err error) {
+	statement := `
+        INSERT INTO planets (
+            id,
+            name,
+            climate,
+            terrain,
+            created_at,
+            updated_at
+        ) VALUES (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6
+        ) ON CONFLICT (id)
+        DO UPDATE SET 
+            name = $2,
+            climate = $3,
+            terrain = $4,
+            created_at = $5,
+            updated_at = $6
+        WHERE
+            planets.id = $1;
+    `
+	err = r.storage.Exec(statement,
+		planet.ID,
+		planet.Name,
+		planet.Climate,
+		planet.Terrain,
+		time.Now().UTC(),
+		time.Now().UTC(),
+	)
 	return
 }
