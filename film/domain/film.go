@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Movie struct {
+type Film struct {
 	ID          int       `json:"id" db:"id"`
 	Title       string    `json:"title" db:"title"`
 	Director    string    `json:"director" db:"director"`
@@ -14,7 +14,7 @@ type Movie struct {
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }
 
-func (d Movie) String() string {
+func (d Film) String() string {
 	b, err := json.Marshal(d)
 	if err != nil {
 		return ""
