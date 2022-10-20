@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/paraizofelipe/star-planet/settings"
 )
 
@@ -15,12 +16,12 @@ func main() {
 
 	logger := log.New(os.Stdout, "", log.LstdFlags|log.Lshortfile)
 
-	storage, err := sqlx.Open("postgres", settings.Storage)
+	_, err = sqlx.Open("postgres", settings.Storage)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	url := fmt.Sprintf("%s:%s", settings.Host, settings.Port)
+	url := fmt.Sprintf("%s:%d", settings.Host, settings.Port)
 
 	if err = http.ListenAndServe(url, nil); err != nil {
 		logger.Fatal(err)
