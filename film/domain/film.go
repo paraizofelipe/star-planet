@@ -7,6 +7,7 @@ import (
 
 type Film struct {
 	ID          int       `json:"id" db:"id"`
+	PlanetID    int       `json:"planet_id" db:"planet_id"`
 	Title       string    `json:"title" db:"title"`
 	Director    string    `json:"director" db:"director"`
 	ReleaseDate time.Time `json:"release_date" db:"release_date"`

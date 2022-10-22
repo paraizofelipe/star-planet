@@ -23,6 +23,7 @@ func (r repository) Add(film domain.Film) (err error) {
 	statement := `
         INSERT INTO films (
             id,
+            planet_id,
             title,
             director,
             Release_date,
@@ -34,11 +35,13 @@ func (r repository) Add(film domain.Film) (err error) {
             $3,
             $4,
             $5,
-            $6
+            $6,
+            $7
         );
     `
 	err = r.storage.Exec(statement,
 		film.ID,
+		film.PlanetID,
 		film.Title,
 		film.Director,
 		film.ReleaseDate,
@@ -52,6 +55,7 @@ func (r repository) UpdateOrAdd(film domain.Film) (err error) {
 	statement := `
         INSERT INTO films (
             id,
+            planet_id,
             title,
             director,
             Release_date,
@@ -63,20 +67,23 @@ func (r repository) UpdateOrAdd(film domain.Film) (err error) {
             $3,
             $4,
             $5,
-            $6
+            $6,
+            $7
         ) ON CONFLICT (id)
         DO UPDATE SET 
             id = $1,
-            title = $2,
-            director = $3,
-            Release_date = $4,
-            created_at = $5,
-            updated_at = $6
+            planet_id = $2
+            title = $3,
+            director = $4,
+            Release_date = $5,
+            created_at = $6,
+            updated_at = $7
         WHERE
             films.id = $1;
     `
 	err = r.storage.Exec(statement,
 		film.ID,
+		film.PlanetID,
 		film.Title,
 		film.Director,
 		film.ReleaseDate,
