@@ -51,7 +51,7 @@ func (r repository) Add(planet domain.Planet) (err error) {
 
 func (r repository) AddFilmToPlanet(planetID int, filmID int) (err error) {
 	statement := `
-			INSERT INTO films_to_planets (
+			INSERT INTO films (
 				planet_id,
 				film_id,
 				created_at,
@@ -79,6 +79,7 @@ func (r repository) RemoveByID(id int) (err error) {
 func (r repository) FindByName(name string) (planet domain.Planet, err error) {
 	statement := `
         SELECT
+            id,
             name,
             climate,
             terrain,
@@ -87,7 +88,7 @@ func (r repository) FindByName(name string) (planet domain.Planet, err error) {
         FROM
             planets
         WHERE
-            email = $1;
+            name = $1;
 	`
 	err = r.storage.Find(statement, &planet, name)
 	if err == sql.ErrNoRows {
@@ -97,38 +98,44 @@ func (r repository) FindByName(name string) (planet domain.Planet, err error) {
 }
 
 func (r repository) FindByID(id int) (planet domain.Planet, err error) {
+	var films []filmsDomain.Film
+
 	statement := `
-        SELECT
-            name,
-            climate,
-            terrain,
-            created_at,
-            updated_at
-        FROM
-            planets
-        WHERE
-            id = $1;
+	       SELECT
+               id,
+	           name,
+	           climate,
+	           terrain,
+	           created_at,
+	           updated_at
+	       FROM
+	           planets
+	       WHERE
+	           id = $1;
 	`
 	err = r.storage.Find(statement, &planet, id)
 	if err == sql.ErrNoRows {
 		err = nil
 	}
+	if films, err = r.FindFilms(id); err != nil {
+		return
+	}
+	planet.Films = films
 	return
 }
 
 func (r repository) FindFilms(planetID int) (films []filmsDomain.Film, err error) {
 	statement := `
-		SELECT p.id,
-			m.title, 
-			m.director,
-			m.release_date,
-			m.created_at,
-			m.updated_at
-			FROM  films_to_planets as mp
+		SELECT f.id, 
+			f.title,
+            f.planet_id,
+			f.director,
+			f.release_date,
+			f.created_at,
+			f.updated_at
+			FROM  films as f
 		INNER JOIN planets as p 
-			ON p.id = mp.planet_id
-		INNER JOIN films as m
-			ON m.id = mp.film_id
+			ON p.id = f.planet_id
 		WHERE p.id = $1;
 	`
 	err = r.storage.FindAll(statement, &films, planetID)
@@ -141,6 +148,7 @@ func (r repository) FindFilms(planetID int) (films []filmsDomain.Film, err error
 func (r repository) FindAll() (planets []domain.Planet, err error) {
 	statement := `
         SELECT
+            id,
             name,
             climate,
             terrain,
@@ -149,7 +157,10 @@ func (r repository) FindAll() (planets []domain.Planet, err error) {
         FROM
             planets;
 	`
-	err = r.storage.Find(statement, &planets, nil)
+	err = r.storage.FindAll(statement, &planets)
+	if err == sql.ErrNoRows {
+		err = nil
+	}
 	return
 }
 

@@ -20,7 +20,7 @@ func TestPlanetServiceLoad(t *testing.T) {
 	}
 
 	service = NewService(storage)
-	err = service.Load(1)
+	err = service.Load(8)
 	if err != nil {
 		t.Error(err)
 	}

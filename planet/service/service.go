@@ -12,7 +12,6 @@ type Writer interface {
 	Load(id int) error
 	Add(domain.Planet) error
 	RemoveByID(id int) error
-	UpdateOrAdd(domain.Planet) error
 }
 
 type Service interface {

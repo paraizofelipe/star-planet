@@ -16,12 +16,7 @@ type Writer interface {
 	UpdateOrAdd(domain.Planet) error
 }
 
-type Relater interface {
-	AddFilmToPlanet(planetID int, filmID int) error
-}
-
 type PlanetRepository interface {
 	Reader
 	Writer
-	Relater
 }
