@@ -13,20 +13,12 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
 	        UNIQUE (name) 
 	);
 	CREATE TABLE IF NOT EXISTS films (
-	        id integer NOT NULL PRIMARY KEY,
+	        id integer NOT NULL,
+	        planet_id integer REFERENCES planets (id) ON DELETE CASCADE,
 	        title varchar(64) NOT NULL,
 	        director varchar(150) NOT NULL,
 	        release_date timestamptz NOT NULL DEFAULT now(),
 	        created_at timestamptz NOT NULL DEFAULT now(),
-	        updated_at timestamptz NOT NULL DEFAULT now(),
-	        UNIQUE (title) 
+	        updated_at timestamptz NOT NULL DEFAULT now()
 	);
-	CREATE TABLE IF NOT EXISTS films_to_planets (
-	    film_id integer NOT NULL REFERENCES films(id) ON DELETE CASCADE,
-	    planet_id integer NOT NULL REFERENCES planets(id) ON DELETE CASCADE,
-	    created_at timestamptz NOT NULL DEFAULT now(),
-	    updated_at timestamptz NOT NULL DEFAULT now(),
-	    CONSTRAINT films_to_planets_mkey PRIMARY KEY (film_id, planet_id) 
-	);
-
 EOSQL
