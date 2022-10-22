@@ -10,6 +10,10 @@ deps:
 build:
 	$(LINUX_AMD64) go build -o star-planet-api main.go
 
+.PHONY: run
+run:
+	@go run ./main.go
+
 .PHONY: install-lint
 install-lint:
 	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$GOPATH/bin
