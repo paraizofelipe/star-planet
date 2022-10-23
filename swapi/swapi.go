@@ -1,9 +1,5 @@
 package swapi
 
-import (
-	"fmt"
-)
-
 type RespFilm struct {
 	Title         string   `json:"title"`
 	EpisodeID     int      `json:"episode_id"`
@@ -38,32 +34,7 @@ type RespPlanet struct {
 	URL            string   `json:"url"`
 }
 
-func (c *Client) Planet(id int) (RespPlanet, error) {
-	req, err := c.newRequest(fmt.Sprintf("planets/%d", id))
-	if err != nil {
-		return RespPlanet{}, err
-	}
-
-	var planet RespPlanet
-
-	if _, err = c.do(req, &planet); err != nil {
-		return RespPlanet{}, err
-	}
-
-	return planet, nil
-}
-
-func (c *Client) Film(id int) (RespFilm, error) {
-	req, err := c.newRequest(fmt.Sprintf("films/%d", id))
-	if err != nil {
-		return RespFilm{}, err
-	}
-
-	var film RespFilm
-
-	if _, err = c.do(req, &film); err != nil {
-		return RespFilm{}, err
-	}
-
-	return film, nil
+type SWAPI interface {
+	Planet(id int) (RespPlanet, error)
+	Film(id int) (RespFilm, error)
 }

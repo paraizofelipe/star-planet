@@ -23,7 +23,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-func NewClient(options ...Option) *Client {
+func NewClient(options ...Option) SWAPI {
 	c := &Client{
 		baseURL: &url.URL{
 			Scheme: defaultBaseURLScheme,
@@ -64,7 +64,7 @@ func (c *Client) newRequest(s string) (*http.Request, error) {
 	return req, nil
 }
 
-func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
+func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) { // nolint
 	req.Close = true
 
 	resp, err := c.httpClient.Do(req)
@@ -82,4 +82,34 @@ func (c *Client) do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+func (c *Client) Planet(id int) (RespPlanet, error) {
+	req, err := c.newRequest(fmt.Sprintf("planets/%d", id))
+	if err != nil {
+		return RespPlanet{}, err
+	}
+
+	var planet RespPlanet
+
+	if _, err = c.do(req, &planet); err != nil {
+		return RespPlanet{}, err
+	}
+
+	return planet, nil
+}
+
+func (c *Client) Film(id int) (RespFilm, error) {
+	req, err := c.newRequest(fmt.Sprintf("films/%d", id))
+	if err != nil {
+		return RespFilm{}, err
+	}
+
+	var film RespFilm
+
+	if _, err = c.do(req, &film); err != nil {
+		return RespFilm{}, err
+	}
+
+	return film, nil
 }
