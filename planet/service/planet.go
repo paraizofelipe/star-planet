@@ -2,13 +2,9 @@ package service
 
 import (
 	"log"
-	"strconv"
-	"strings"
 	"sync"
-	"time"
 
 	"github.com/jmoiron/sqlx"
-	filmDomain "github.com/paraizofelipe/star-planet/film/domain"
 	filmService "github.com/paraizofelipe/star-planet/film/service"
 	"github.com/paraizofelipe/star-planet/planet/domain"
 	"github.com/paraizofelipe/star-planet/planet/repository"
@@ -18,57 +14,14 @@ import (
 type PlanetService struct {
 	filmService filmService.Service
 	repository  repository.PlanetRepository
+	swapiClient swapi.SWAPI
 }
 
 func NewService(db *sqlx.DB) Service {
 	return &PlanetService{
 		filmService: filmService.NewService(db),
 		repository:  repository.NewPostgreRepository(db),
-	}
-}
-
-func (s PlanetService) extractIDfromURL(url string) (id int, err error) {
-	chunks := strings.Split(url, "/")
-	lastPath := chunks[len(chunks)-2]
-	if id, err = strconv.Atoi(lastPath); err != nil {
-		return
-	}
-	return
-}
-
-func (s PlanetService) LoadFilms(wg *sync.WaitGroup, planetID int, filmURL string) {
-	var (
-		err          error
-		filmID       int
-		respFilm     swapi.RespFilm
-		releaseDate  time.Time
-		client       *swapi.Client = swapi.NewClient()
-		filmToPlanet filmDomain.Film
-	)
-
-	defer wg.Done()
-
-	if filmID, err = s.extractIDfromURL(filmURL); err != nil {
-		log.Println(err)
-	}
-	if respFilm, err = client.Film(filmID); err != nil {
-		log.Println(err)
-	}
-
-	if releaseDate, err = time.Parse("2006-01-02", respFilm.ReleaseDate); err != nil {
-		log.Println(err)
-	}
-
-	filmToPlanet = filmDomain.Film{
-		ID:          filmID,
-		PlanetID:    planetID,
-		ReleaseDate: releaseDate,
-		Title:       respFilm.Title,
-		Director:    respFilm.Director,
-	}
-
-	if err = s.filmService.Add(filmToPlanet); err != nil {
-		log.Println(err)
+		swapiClient: swapi.NewClient(),
 	}
 }
 
@@ -76,7 +29,6 @@ func (s PlanetService) Load(planetID int) (err error) {
 	var (
 		planet     domain.Planet
 		respPlanet swapi.RespPlanet
-		client     *swapi.Client = swapi.NewClient()
 		wg         sync.WaitGroup
 	)
 
@@ -88,7 +40,7 @@ func (s PlanetService) Load(planetID int) (err error) {
 		return
 	}
 
-	if respPlanet, err = client.Planet(planetID); err != nil {
+	if respPlanet, err = s.swapiClient.Planet(planetID); err != nil {
 		return
 	}
 
@@ -99,13 +51,20 @@ func (s PlanetService) Load(planetID int) (err error) {
 		Terrain: respPlanet.Terrain,
 	}
 
-	if err = s.Add(planet); err != nil {
+	if err = s.repository.Add(planet); err != nil {
 		return
 	}
 
 	for _, filmURL := range respPlanet.FilmURLs {
 		wg.Add(1)
-		go s.LoadFilms(&wg, planetID, filmURL)
+
+		go func(planetID int, filmURL string) {
+			defer wg.Done()
+
+			if err := s.filmService.LoadFilms(planetID, filmURL); err != nil {
+				log.Println(err)
+			}
+		}(planetID, filmURL)
 	}
 
 	wg.Wait()
@@ -129,6 +88,6 @@ func (s PlanetService) FindByID(id int) (planet domain.Planet, err error) {
 	return s.repository.FindByID(id)
 }
 
-func (s PlanetService) FindAll() (plantes []domain.Planet, err error) {
+func (s PlanetService) FindAll() (planets []domain.Planet, err error) {
 	return s.repository.FindAll()
 }

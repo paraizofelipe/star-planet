@@ -25,18 +25,18 @@ func NewHandler(db *sqlx.DB, logger *log.Logger) Handler {
 
 func (h Planet) load(ctx *router.Context) {
 	var (
-		err       error
-		planet_id int
-		param_id  string = ctx.Params["id"]
+		err      error
+		planetID int
+		paramID  string = ctx.Params["id"]
 	)
 
-	if planet_id, err = strconv.Atoi(param_id); err != nil {
+	if planetID, err = strconv.Atoi(paramID); err != nil {
 		h.Logger.Println(err)
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Invalid ID!"})
 		return
 	}
 
-	if err = h.Service.Load(planet_id); err != nil {
+	if err = h.Service.Load(planetID); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when load the planet!"})
 		return
 	}
@@ -60,17 +60,17 @@ func (h Planet) list(ctx *router.Context) {
 
 func (h Planet) remove(ctx *router.Context) {
 	var (
-		planet_id int
-		param_id  string = ctx.Params["id"]
-		err       error
+		planetID int
+		paramID  string = ctx.Params["id"]
+		err      error
 	)
 
-	if planet_id, err = strconv.Atoi(param_id); err != nil {
+	if planetID, err = strconv.Atoi(paramID); err != nil {
 		h.Logger.Println(err)
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Invalid ID!"})
 	}
 
-	if err = h.Service.RemoveByID(planet_id); err != nil {
+	if err = h.Service.RemoveByID(planetID); err != nil {
 		h.Logger.Println(err)
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when removing the planet!"})
 		return
@@ -81,19 +81,19 @@ func (h Planet) remove(ctx *router.Context) {
 
 func (h Planet) findByID(ctx *router.Context) {
 	var (
-		err       error
-		planet_id int
-		param_id  string = ctx.Params["id"]
-		planet    domain.Planet
+		err      error
+		planetID int
+		paramID  string = ctx.Params["id"]
+		planet   domain.Planet
 	)
 
-	if planet_id, err = strconv.Atoi(param_id); err != nil {
+	if planetID, err = strconv.Atoi(paramID); err != nil {
 		h.Logger.Println(err)
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Invalid ID!"})
 		return
 	}
 
-	if planet, err = h.Service.FindByID(planet_id); err != nil {
+	if planet, err = h.Service.FindByID(planetID); err != nil {
 		h.Logger.Println(err)
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when fetching the planet!"})
 		return
@@ -109,12 +109,12 @@ func (h Planet) findByID(ctx *router.Context) {
 
 func (h Planet) findByName(ctx *router.Context) {
 	var (
-		err         error
-		planet_name string = ctx.Params["name"]
-		planet      domain.Planet
+		err        error
+		planetName string = ctx.Params["name"]
+		planet     domain.Planet
 	)
 
-	if planet, err = h.Service.FindByName(planet_name); err != nil {
+	if planet, err = h.Service.FindByName(planetName); err != nil {
 		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when fetching the planet!"})
 		return
 	}
