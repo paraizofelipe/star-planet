@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -27,9 +28,13 @@ func main() {
 
 	url := fmt.Sprintf("%s:%d", settings.Host, settings.Port)
 
-	log.Printf("Server listening in %s", url)
+	server := &http.Server{
+		Addr:              url,
+		ReadHeaderTimeout: 3 * time.Second,
+	}
 
-	if err = http.ListenAndServe(url, nil); err != nil {
+	log.Printf("Server listening in %s", url)
+	if err = server.ListenAndServe(); err != nil {
 		logger.Fatal(err)
 	}
 }

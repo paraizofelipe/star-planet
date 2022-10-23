@@ -16,15 +16,20 @@ run:
 
 .PHONY: install-lint
 install-lint:
-	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$GOPATH/bin
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
 
 .PHONY: lint
 lint:
 	@golangci-lint run ./...
 
-.PHONY: mockgen
+.PHONY: mockgen 
 mockgen:
-	@go get github.com/golang/mock/mockgen@v1.5.0
+	@go install github.com/golang/mock/mockgen@v1.6.0
+	@mockgen -source ./film/repository/repository.go -destination ./film/repository/repository_mock.go -package repository
+	@mockgen -source ./planet/repository/repository.go -destination ./planet/repository/repository_mock.go -package repository
+	@mockgen -source ./film/service/service.go -destination ./film/service/service_mock.go -package service
+	@mockgen -source ./planet/service/service.go -destination ./planet/service/service_mock.go -package service
+	@mockgen -source ./swapi/swapi.go -destination ./swapi/swapi_mock.go -package swapi
 
 .PHONY: build
 start: build
@@ -42,6 +47,8 @@ dk-start:
 dk-build: build
 	@docker build -t star-planet:latest .
 
+
 .PHONY: dk-deploy
 dk-deploy:
 	@docker-compose up -d --build
+
