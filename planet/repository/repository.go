@@ -13,7 +13,6 @@ type Reader interface {
 type Writer interface {
 	Add(domain.Planet) error
 	RemoveByID(id int) error
-	UpdateOrAdd(domain.Planet) error
 }
 
 type PlanetRepository interface {

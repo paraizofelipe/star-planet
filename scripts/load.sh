@@ -24,16 +24,16 @@ function list_planet {
 
 planets=(1 2 3 4 5 6 7 8 9 10)
 
-time for planet_id in "${planets[@]}"; do
-	time load_planet "$planet_id"
+for planet_id in "${planets[@]}"; do
+	load_planet "$planet_id"
 done
 
-time list_planet
+list_planet
 
-time for planet_id in "${planets[@]}"; do
-	time fetch_planet_by_id "$planet_id"
+for planet_id in "${planets[@]}"; do
+	fetch_planet_by_id "$planet_id"
 done
 
-time for planet_id in "${planets[@]}"; do
-	time remove_planet "$planet_id"
+for planet_id in "${planets[@]}"; do
+	remove_planet "$planet_id"
 done

@@ -23,7 +23,3 @@ func (s FilmService) FindByID(id int) (film domain.Film, err error) {
 func (s FilmService) Add(film domain.Film) (err error) {
 	return s.repository.Add(film)
 }
-
-func (s FilmService) UpdateOrAdd(film domain.Film) (err error) {
-	return s.repository.UpdateOrAdd(film)
-}

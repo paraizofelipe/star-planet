@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	filmDomains "github.com/paraizofelipe/star-planet/film/domain"
+	filmDomain "github.com/paraizofelipe/star-planet/film/domain"
 	filmService "github.com/paraizofelipe/star-planet/film/service"
 	"github.com/paraizofelipe/star-planet/planet/domain"
 	"github.com/paraizofelipe/star-planet/planet/repository"
@@ -43,7 +43,7 @@ func (s PlanetService) LoadFilms(wg *sync.WaitGroup, planetID int, filmURL strin
 		respFilm     swapi.RespFilm
 		releaseDate  time.Time
 		client       *swapi.Client = swapi.NewClient()
-		filmToPlanet filmDomains.Film
+		filmToPlanet filmDomain.Film
 	)
 
 	defer wg.Done()
@@ -59,7 +59,7 @@ func (s PlanetService) LoadFilms(wg *sync.WaitGroup, planetID int, filmURL strin
 		log.Println(err)
 	}
 
-	filmToPlanet = filmDomains.Film{
+	filmToPlanet = filmDomain.Film{
 		ID:          filmID,
 		PlanetID:    planetID,
 		ReleaseDate: releaseDate,
@@ -126,10 +126,7 @@ func (s PlanetService) FindByName(name string) (planet domain.Planet, err error)
 }
 
 func (s PlanetService) FindByID(id int) (planet domain.Planet, err error) {
-	if planet, err = s.repository.FindByID(id); err != nil {
-		return
-	}
-	return
+	return s.repository.FindByID(id)
 }
 
 func (s PlanetService) FindAll() (plantes []domain.Planet, err error) {

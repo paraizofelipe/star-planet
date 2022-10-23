@@ -49,29 +49,6 @@ func (r repository) Add(planet domain.Planet) (err error) {
 	return
 }
 
-func (r repository) AddFilmToPlanet(planetID int, filmID int) (err error) {
-	statement := `
-			INSERT INTO films (
-				planet_id,
-				film_id,
-				created_at,
-				updated_at
-			) VALUES (
-				$1,
-				$2,
-				$3,
-				$4
-			);
-	`
-	err = r.storage.Exec(statement,
-		planetID,
-		filmID,
-		time.Now().UTC(),
-		time.Now().UTC(),
-	)
-	return
-}
-
 func (r repository) RemoveByID(id int) (err error) {
 	return r.storage.Exec(`DELETE FROM planets WHERE id = $1`, id)
 }
@@ -161,42 +138,5 @@ func (r repository) FindAll() (planets []domain.Planet, err error) {
 	if err == sql.ErrNoRows {
 		err = nil
 	}
-	return
-}
-
-func (r repository) UpdateOrAdd(planet domain.Planet) (err error) {
-	statement := `
-        INSERT INTO planets (
-            id,
-            name,
-            climate,
-            terrain,
-            created_at,
-            updated_at
-        ) VALUES (
-            $1,
-            $2,
-            $3,
-            $4,
-            $5,
-            $6
-        ) ON CONFLICT (id)
-        DO UPDATE SET 
-            name = $2,
-            climate = $3,
-            terrain = $4,
-            created_at = $5,
-            updated_at = $6
-        WHERE
-            planets.id = $1;
-    `
-	err = r.storage.Exec(statement,
-		planet.ID,
-		planet.Name,
-		planet.Climate,
-		planet.Terrain,
-		time.Now().UTC(),
-		time.Now().UTC(),
-	)
 	return
 }

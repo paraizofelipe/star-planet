@@ -8,7 +8,6 @@ type Reader interface {
 
 type Writer interface {
 	Add(domain.Film) error
-	UpdateOrAdd(domain.Film) error
 }
 
 type Service interface {
