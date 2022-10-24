@@ -12,3 +12,15 @@ services:
       POSTGRES_PASSWORD: planet
     volumes:
       - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  stat-planet-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: start-planet-api:latest
+    depends_on:
+      - database
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env

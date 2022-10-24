@@ -37,6 +37,7 @@ func (h Planet) load(ctx *router.Context) {
 	}
 
 	if err = h.Service.Load(planetID); err != nil {
+		h.Logger.Println(err)
 		ctx.JSON(http.StatusInternalServerError, Response{"Error when load the planet!"})
 		return
 	}
