@@ -123,6 +123,8 @@ func (r repository) FindFilms(planetID int) (films []filmsDomain.Film, err error
 }
 
 func (r repository) FindAll() (planets []domain.Planet, err error) {
+	var films []filmsDomain.Film
+
 	statement := `
         SELECT
             id,
@@ -135,6 +137,12 @@ func (r repository) FindAll() (planets []domain.Planet, err error) {
             planets;
 	`
 	err = r.storage.FindAll(statement, &planets)
+	for key, planet := range planets {
+		if films, err = r.FindFilms(planet.ID); err != nil {
+			return
+		}
+		planets[key].Films = films
+	}
 	if err == sql.ErrNoRows {
 		err = nil
 	}

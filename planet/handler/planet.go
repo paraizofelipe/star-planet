@@ -32,16 +32,16 @@ func (h Planet) load(ctx *router.Context) {
 
 	if planetID, err = strconv.Atoi(paramID); err != nil {
 		h.Logger.Println(err)
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Invalid ID!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Invalid ID!"})
 		return
 	}
 
 	if err = h.Service.Load(planetID); err != nil {
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when load the planet!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Error when load the planet!"})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, SuccessResponse{"Planet loaded with success"})
+	ctx.JSON(http.StatusCreated, Response{"Planet loaded with success"})
 }
 
 func (h Planet) list(ctx *router.Context) {
@@ -50,7 +50,7 @@ func (h Planet) list(ctx *router.Context) {
 		err     error
 	)
 	if planets, err = h.Service.FindAll(); err != nil {
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when fetching the planets!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Error when fetching the planets!"})
 		h.Logger.Print(err)
 		return
 	}
@@ -67,16 +67,17 @@ func (h Planet) remove(ctx *router.Context) {
 
 	if planetID, err = strconv.Atoi(paramID); err != nil {
 		h.Logger.Println(err)
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Invalid ID!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Invalid ID!"})
+		return
 	}
 
 	if err = h.Service.RemoveByID(planetID); err != nil {
 		h.Logger.Println(err)
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when removing the planet!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Error when removing the planet!"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, SuccessResponse{"Planet removed."})
+	ctx.JSON(http.StatusOK, Response{"Planet removed."})
 }
 
 func (h Planet) findByID(ctx *router.Context) {
@@ -89,18 +90,18 @@ func (h Planet) findByID(ctx *router.Context) {
 
 	if planetID, err = strconv.Atoi(paramID); err != nil {
 		h.Logger.Println(err)
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Invalid ID!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Invalid ID!"})
 		return
 	}
 
 	if planet, err = h.Service.FindByID(planetID); err != nil {
 		h.Logger.Println(err)
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when fetching the planet!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Error when fetching the planet!"})
 		return
 	}
 
 	if planet.ID == 0 {
-		ctx.JSON(http.StatusNotFound, ErrorResponse{"Planet not found!"})
+		ctx.JSON(http.StatusNotFound, Response{"Planet not found!"})
 		return
 	}
 
@@ -115,12 +116,12 @@ func (h Planet) findByName(ctx *router.Context) {
 	)
 
 	if planet, err = h.Service.FindByName(planetName); err != nil {
-		ctx.JSON(http.StatusInternalServerError, ErrorResponse{"Error when fetching the planet!"})
+		ctx.JSON(http.StatusInternalServerError, Response{"Error when fetching the planet!"})
 		return
 	}
 
 	if planet.ID == 0 {
-		ctx.JSON(http.StatusNotFound, ErrorResponse{"Planet not found!"})
+		ctx.JSON(http.StatusNotFound, Response{"Planet not found!"})
 		return
 	}
 
@@ -128,13 +129,13 @@ func (h Planet) findByName(ctx *router.Context) {
 }
 
 func (h Planet) Router(w http.ResponseWriter, r *http.Request) {
-	router := router.NewRouter(h.Logger)
+	newRouter := router.NewRouter(h.Logger)
 
-	router.AddRoute(`planets/load/(?P<id>[\d|-]+)/?`, http.MethodPost, h.load)
-	router.AddRoute(`planets/?`, http.MethodGet, h.list)
-	router.AddRoute(`planets/id/(?P<id>[\d|-]+)/?`, http.MethodDelete, h.remove)
-	router.AddRoute(`planets/id/(?P<id>[\d|-]+)/?`, http.MethodGet, h.findByID)
-	router.AddRoute(`planets/name/(?P<name>[\w|-]+)/?`, http.MethodGet, h.findByName)
+	newRouter.AddRoute(`planets/load/(?P<id>[\d|-]+)/?`, http.MethodPost, h.load)
+	newRouter.AddRoute(`planets/id/(?P<id>[\d|-]+)/?`, http.MethodGet, h.findByID)
+	newRouter.AddRoute(`planets/?`, http.MethodGet, h.list)
+	newRouter.AddRoute(`planets/id/(?P<id>[\d|-]+)/?`, http.MethodDelete, h.remove)
+	newRouter.AddRoute(`planets/name/(?P<name>[\w|-]+)/?`, http.MethodGet, h.findByName)
 
-	router.ServeHTTP(w, r)
+	newRouter.ServeHTTP(w, r)
 }

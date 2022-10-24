@@ -17,23 +17,11 @@ type Handler interface {
 	Router(http.ResponseWriter, *http.Request)
 }
 
-type ErrorResponse struct {
-	Error string `json:"errors"`
+type Response struct {
+	Message string `json:"message"`
 }
 
-type SuccessResponse struct {
-	Success string `json:"success"`
-}
-
-func (r ErrorResponse) String() string {
-	j, err := json.Marshal(r)
-	if err != nil {
-		return ""
-	}
-	return string(j)
-}
-
-func (r SuccessResponse) String() string {
+func (r Response) String() string {
 	j, err := json.Marshal(r)
 	if err != nil {
 		return ""
