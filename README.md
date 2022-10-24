@@ -26,7 +26,7 @@ Para facilitar a execução da aplicação, o projeto possui um arquivo `.env` p
 
 ## Observação
 
-A maior parte das operações descritas nessa documentação como, instalação, teste e etc, possuem tarefas definidas no arquivo `Makefile`. Facilitando no processo de execução e mantenabilidade do projeto.
+A maior parte das operações descritas nessa documentação, como instalação, teste e etc, possuem tarefas definidas no arquivo `Makefile`. Facilitando no processo de execução e mantenabilidade do projeto.
 
 ## Instalação
 
@@ -36,7 +36,7 @@ Isto é o que você precisa para instalar o aplicativo a partir do código-fonte
     git clone https://github.com/paraizofelipe/star-planet.git 
 ```
 
-Para construir a versão do docker, você pode utilizar o CLI `docker-compose`, com o comando:
+Para construir a versão do docker você pode utilizar o CLI `docker-compose` com o comando:
 
 ```bash
 	make dk-deploy
@@ -52,13 +52,13 @@ Você pode executar testes assim:
 	make test
 ```
 
-Para rodar a API local em sua workstation, você pode executar o comando:
+Para rodar a API local em sua workstation você pode executar o comando:
 
 ```bash
     STORAGE=postgres://star:planet@localhost:5432/star-planet?sslmode=disable DEBUG=true HOST=0.0.0.0 PORT=3000 make run
 ```
 
-Lembrando que todas a variáveis de ambiente podem ser consultadas no arquivo `.env` e até mesmo utilizada em conjunto com o [direnv](https://direnv.net/)
+Lembrando que todas a variáveis de ambiente podem ser consultadas no arquivo `.env` e até mesmo utilizadas em conjunto com o [direnv](https://direnv.net/)
 
 ## API
 
@@ -88,7 +88,7 @@ curl -i -X GET "http://localhost:300/api/planets/name/Tatooine"
 
 ### Remove
 
-Remove um planet da base de dados pelo seu ID.
+Remove um planeta da base de dados pelo seu ID.
 
 ```bash
 curl -i -X DELETE "http://localhost:300/api/planets/id/1"
