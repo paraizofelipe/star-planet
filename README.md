@@ -13,7 +13,7 @@ O projeto ate o momento possui somente 3 dependências
 
 - mock - para geração dos mocks nos testes unitários
 - pq - driver de conexão para o banco postgres
-- sqlx - para manipulação das queres na camada `repository`
+- sqlx - para manipulação das queries na camada `repository`
 
 ## Variáveis
 
